@@ -419,31 +419,42 @@
                 }
             });
 
-              $('#contact-form').on('submit', async function(e) {
-     e.preventDefault();
-     const formData = new FormData(this);
-     const data = Object.fromEntries(formData);
-
-     try {
-       const response = await fetch('/api/contact', {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-         },
-         body: JSON.stringify(data),
-       });
-
-       if (response.ok) {
-         alert('感謝你的訊息！我們將盡快回覆你，準備好迎接極限挑戰了嗎？');
-         this.reset();
-       } else {
-         alert('發送失敗，請稍後再試。');
-       }
-     } catch (error) {
-       console.error('Error:', error);
-       alert('發送失敗，請稍後再試。');
-     }
-   });
+              $('#contact-form').on('submit', function(e) {
+    e.preventDefault();
+    
+    var form = $(this);
+    var submitButton = form.find('button[type="submit"]');
+    
+    // 禁用提交按鈕，防止重複提交
+    submitButton.prop('disabled', true);
+    
+    // 獲取表單數據
+    var formData = {
+        name: form.find('input[name="name"]').val(),
+        email: form.find('input[name="email"]').val(),
+        message: form.find('textarea[name="message"]').val()
+    };
+    
+    // 發送 AJAX 請求
+    $.ajax({
+        url: '/api/contact',  // 確保這個 URL 指向您的 API 端點
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        success: function(response) {
+            alert('感謝你的訊息！我們將盡快回覆你，準備好迎接極限挑戰了嗎？');
+            form[0].reset();
+        },
+        error: function(xhr, status, error) {
+            alert('抱歉，發送訊息時出現錯誤。請稍後再試。');
+            console.error('Error:', error);
+        },
+        complete: function() {
+            // 重新啟用提交按鈕
+            submitButton.prop('disabled', false);
+        }
+    });
+});
 
             $(window).scroll(function() {
                 if ($(this).scrollTop() > 50) {
