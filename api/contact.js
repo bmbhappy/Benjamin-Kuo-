@@ -1,30 +1,41 @@
-import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
-
-const mailerSend = new MailerSend({
-  apiKey: process.env.MAILERSEND_API_KEY,
-});
-
-async function sendEmail(to, subject, text) {
-  const sentFrom = new Sender("noreply@yourdomain.com", "Benjamin Kuo 健身工作室");
-  const recipients = [new Recipient(to)];
-
-  const emailParams = new EmailParams()
-    .setFrom(sentFrom)
-    .setTo(recipients)
-    .setSubject(subject)
-    .setText(text);
-
-  try {
-    const response = await mailerSend.email.send(emailParams);
-    console.log('Email sent successfully:', response);
-    return response;
-  } catch (error) {
-    console.error('Error sending email:', error);
-    throw error;
-  }
-}
-
 export default async function handler(req, res) {
+  let MailerSend, EmailParams, Sender, Recipient;
+  try {
+    const mailersend = await import('mailersend');
+    MailerSend = mailersend.MailerSend;
+    EmailParams = mailersend.EmailParams;
+    Sender = mailersend.Sender;
+    Recipient = mailersend.Recipient;
+  } catch (error) {
+    console.error('Error importing mailersend:', error);
+    res.status(500).json({ error: 'Server configuration error' });
+    return;
+  }
+
+  const mailerSend = new MailerSend({
+    apiKey: process.env.MAILERSEND_API_KEY,
+  });
+
+  async function sendEmail(to, subject, text) {
+    const sentFrom = new Sender("noreply@yourdomain.com", "Benjamin Kuo 健身工作室");
+    const recipients = [new Recipient(to)];
+
+    const emailParams = new EmailParams()
+      .setFrom(sentFrom)
+      .setTo(recipients)
+      .setSubject(subject)
+      .setText(text);
+
+    try {
+      const response = await mailerSend.email.send(emailParams);
+      console.log('Email sent successfully:', response);
+      return response;
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw error;
+    }
+  }
+
   if (req.method === 'POST') {
     try {
       const { name, email, message } = req.body;
