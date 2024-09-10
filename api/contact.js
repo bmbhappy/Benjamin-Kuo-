@@ -1,7 +1,7 @@
    import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
 
 const mailerSend = new MailerSend({
-  apiKey: process.env.mlsn.52d8bbff0e2d1d2ff45bfed1538e581a74b2bdfe6201ee3914bde494a8854a1d,
+  apiKey: process.env.MAILERSEND_API_KEY,
 });
 
 async function sendEmail(to, subject, text) {
