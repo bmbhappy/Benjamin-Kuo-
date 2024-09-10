@@ -1,23 +1,11 @@
-export default async function handler(req, res) {
-  let MailerSend, EmailParams, Sender, Recipient;
-  try {
-    const mailersend = await import('mailersend');
-    MailerSend = mailersend.MailerSend;
-    EmailParams = mailersend.EmailParams;
-    Sender = mailersend.Sender;
-    Recipient = mailersend.Recipient;
-  } catch (error) {
-    console.error('Error importing mailersend:', error);
-    res.status(500).json({ error: 'Server configuration error' });
-    return;
-  }
+const { MailerSend, EmailParams, Sender, Recipient } = require('mailersend');
 
-  const mailerSend = new MailerSend({
-    apiKey: process.env.MAILERSEND_API_KEY,
-  });
+const mailerSend = new MailerSend({
+  apiKey: process.env.MAILERSEND_API_KEY,
+});
 
- async function sendEmail(to, subject, text) {
-  const sentFrom = new Sender(process.env.MAILERSEND_FROM_EMAIL, "Benjamin Kuo 健身工作室");
+async function sendEmail(to, subject, text) {
+  const sentFrom = new Sender("noreply@trial-jy7zpl9z3do45vx6.mlsender.net", "Benjamin Kuo 健身工作室");
   const recipients = [new Recipient(to)];
 
   const emailParams = new EmailParams()
@@ -49,7 +37,7 @@ async function sendNotificationToOwner(name, email, message) {
   await sendEmail(process.env.OWNER_EMAIL, subject, text);
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const { name, email, message } = req.body;
@@ -86,4 +74,4 @@ Benjamin Kuo 健身團隊`
     res.setHeader('Allow', ['POST']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-}
+};
