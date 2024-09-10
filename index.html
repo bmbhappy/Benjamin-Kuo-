@@ -419,11 +419,31 @@
                 }
             });
 
-            $('#contact-form').on('submit', function(e) {
-                e.preventDefault();
-                alert('感謝你的訊息！我們將盡快回覆你，準備好迎接極限挑戰了嗎？');
-                this.reset();
-            });
+              $('#contact-form').on('submit', async function(e) {
+     e.preventDefault();
+     const formData = new FormData(this);
+     const data = Object.fromEntries(formData);
+
+     try {
+       const response = await fetch('/api/contact', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(data),
+       });
+
+       if (response.ok) {
+         alert('感謝你的訊息！我們將盡快回覆你，準備好迎接極限挑戰了嗎？');
+         this.reset();
+       } else {
+         alert('發送失敗，請稍後再試。');
+       }
+     } catch (error) {
+       console.error('Error:', error);
+       alert('發送失敗，請稍後再試。');
+     }
+   });
 
             $(window).scroll(function() {
                 if ($(this).scrollTop() > 50) {
