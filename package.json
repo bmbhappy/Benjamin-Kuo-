@@ -1,0 +1,15 @@
+{
+  "name": "benjamin-kuo-",
+  "version": "1.0.0",
+  "description": "Benjamin Kuo 郭瀚陽 | 極限健身教練",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mailersend": "^2.3.0"
+  }
+}
