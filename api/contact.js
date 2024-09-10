@@ -1,4 +1,4 @@
-   import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
+import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
 
 const mailerSend = new MailerSend({
   apiKey: process.env.MAILERSEND_API_KEY,
@@ -15,8 +15,9 @@ async function sendEmail(to, subject, text) {
     .setText(text);
 
   try {
-    await mailerSend.email.send(emailParams);
-    console.log('Email sent successfully');
+    const response = await mailerSend.email.send(emailParams);
+    console.log('Email sent successfully:', response);
+    return response;
   } catch (error) {
     console.error('Error sending email:', error);
     throw error;
@@ -25,12 +26,11 @@ async function sendEmail(to, subject, text) {
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { name, email, message } = req.body;
-    
-    console.log('Received message:', { name, email, message });
-
     try {
-      // 發送確認郵件給客戶
+      const { name, email, message } = req.body;
+      
+      console.log('Received data:', { name, email, message });
+
       await sendEmail(
         email,
         '感謝您的訊息 - Benjamin Kuo 健身工作室',
@@ -50,8 +50,8 @@ Benjamin Kuo 健身團隊`
 
       res.status(200).json({ message: 'Message received and confirmation sent' });
     } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ error: 'Error processing your request' });
+      console.error('Detailed error:', error);
+      res.status(500).json({ error: 'Error processing your request', details: error.message });
     }
   } else {
     res.setHeader('Allow', ['POST']);
