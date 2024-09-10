@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   });
 
   async function sendEmail(to, subject, text) {
-    const sentFrom = new Sender("noreply@yourdomain.com", "Benjamin Kuo 健身工作室");
+    const sentFrom = new Sender("noreply@trial-jy7zpl9z3do45vx6.mlsender.net", "Benjamin Kuo 健身工作室");
     const recipients = [new Recipient(to)];
 
     const emailParams = new EmailParams()
