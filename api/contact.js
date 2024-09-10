@@ -16,32 +16,47 @@ export default async function handler(req, res) {
     apiKey: process.env.MAILERSEND_API_KEY,
   });
 
-  async function sendEmail(to, subject, text) {
-    const sentFrom = new Sender("noreply@trial-jy7zpl9z3do45vx6.mlsender.net", "Benjamin Kuo 健身工作室");
-    const recipients = [new Recipient(to)];
+ async function sendEmail(to, subject, text) {
+  const sentFrom = new Sender(process.env.MAILERSEND_FROM_EMAIL, "Benjamin Kuo 健身工作室");
+  const recipients = [new Recipient(to)];
 
-    const emailParams = new EmailParams()
-      .setFrom(sentFrom)
-      .setTo(recipients)
-      .setSubject(subject)
-      .setText(text);
+  const emailParams = new EmailParams()
+    .setFrom(sentFrom)
+    .setTo(recipients)
+    .setSubject(subject)
+    .setText(text);
 
-    try {
-      const response = await mailerSend.email.send(emailParams);
-      console.log('Email sent successfully:', response);
-      return response;
-    } catch (error) {
-      console.error('Error sending email:', error);
-      throw error;
-    }
+  try {
+    const response = await mailerSend.email.send(emailParams);
+    console.log('Email sent successfully:', response);
+    return response;
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
   }
+}
 
+async function sendNotificationToOwner(name, email, message) {
+  const subject = '新的聯繫表單提交';
+  const text = `
+    收到新的聯繫表單提交：
+    
+    姓名: ${name}
+    電子郵件: ${email}
+    訊息: ${message}
+  `;
+
+  await sendEmail(process.env.OWNER_EMAIL, subject, text);
+}
+
+export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const { name, email, message } = req.body;
       
       console.log('Received data:', { name, email, message });
 
+      // 發送確認郵件給用戶
       await sendEmail(
         email,
         '感謝您的訊息 - Benjamin Kuo 健身工作室',
@@ -58,6 +73,9 @@ ${message}
 最佳祝福，
 Benjamin Kuo 健身團隊`
       );
+
+      // 發送通知郵件給網站擁有者
+      await sendNotificationToOwner(name, email, message);
 
       res.status(200).json({ message: 'Message received and confirmation sent' });
     } catch (error) {
